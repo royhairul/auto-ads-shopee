@@ -4,8 +4,7 @@ import pkg from './package.json'
 export default defineManifest({
   manifest_version: 3,
   name: 'Auto Ads Shopee',
-  description:
-    'Pantau kampanye iklan Shopee dan tampilkan notifikasi otomatis.',
+  description: 'Pantau iklan Shopee dan tampilkan notifikasi otomatis.',
   version: pkg.version,
 
   icons: {
@@ -20,7 +19,7 @@ export default defineManifest({
       48: 'icons/logo48.png',
       128: 'icons/logo128.png',
     },
-    default_popup: 'src/popup/index.html',
+    // default_popup: 'src/popup/index.html',
   },
 
   permissions: [
@@ -34,12 +33,12 @@ export default defineManifest({
 
   host_permissions: ['https://shopee.co.id/*', 'https://seller.shopee.co.id/*'],
 
-  content_scripts: [
-    {
-      js: ['src/content/main.tsx'],
-      matches: ['https://*/*'],
-    },
-  ],
+  // content_scripts: [
+  //   {
+  //     js: ['src/content/main.tsx'],
+  //     matches: ['https://*/*'],
+  //   },
+  // ],
 
   side_panel: {
     default_path: 'src/sidepanel/index.html',
@@ -57,5 +56,8 @@ export default defineManifest({
     },
   ],
 
-  options_page: 'src/options/index.html',
+  options_ui: {
+    page: 'src/options/index.html',
+    open_in_tab: true,
+  },
 })

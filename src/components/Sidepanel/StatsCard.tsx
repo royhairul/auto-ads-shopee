@@ -1,40 +1,76 @@
 import { Card, CardHeader, CardBody, CardFooter, Skeleton } from '@heroui/react'
 import { formatScaledRupiah } from '@/services/shopee'
 import React from 'react'
+import clsx from 'clsx'
+
+interface StatsCardProps {
+  title: string
+  icon: React.ElementType
+  value?: number
+  loading?: boolean
+  colorScheme?: 'primary' | 'success' | 'warning' | 'danger' | 'default'
+  footer?: React.ReactNode
+  action?: React.ReactNode // 👉 tambahan: tombol atau elemen aksi di samping value
+  footerPosition?: 'inside' | 'bottom' // posisi footer
+}
 
 export default function StatsCard({
   title,
   icon,
-  value,
-  loading,
-  colorScheme,
+  value = 0,
+  loading = false,
+  colorScheme = 'default',
   footer,
-}: {
-  title: string
-  icon: React.ElementType
-  value?: number
-  loading: boolean
-  colorScheme: string
-  footer?: React.ReactNode
-}) {
+  action,
+  footerPosition = 'bottom',
+}: StatsCardProps) {
   const Icon = icon
-  const bgClass = `!bg-${colorScheme}-600/5 !dark:bg-${colorScheme}-600/15 !text-${colorScheme}-600 !dark:text-${colorScheme}-400`
+
+  // mapping warna yang bisa dipakai Tailwind
+  const colorClasses: Record<string, string> = {
+    primary:
+      'bg-blue-600/5 dark:bg-blue-600/15 text-blue-600 dark:text-blue-400',
+    success:
+      'bg-green-600/5 dark:bg-green-600/15 text-green-600 dark:text-green-400',
+    warning:
+      'bg-yellow-600/5 dark:bg-yellow-600/15 text-yellow-600 dark:text-yellow-400',
+    danger: 'bg-red-600/5 dark:bg-red-600/15 text-red-600 dark:text-red-400',
+    default:
+      'bg-gray-600/5 dark:bg-gray-600/15 text-gray-600 dark:text-gray-400',
+  }
+
   return (
-    <Card className={`w-full ${bgClass}`}>
+    <Card className={clsx('w-full', colorClasses[colorScheme])}>
       <CardHeader className="flex gap-2 items-center">
         <Icon size={20} />
         <p className="font-semibold dark:text-white">{title}</p>
       </CardHeader>
-      <CardBody className={footer ? 'py-0' : 'pt-0'}>
+
+      <CardBody
+        className={clsx(
+          'flex flex-col gap-2',
+          footerPosition === 'inside' && 'pb-0'
+        )}
+      >
         {loading ? (
           <Skeleton className="w-24 h-6 rounded-md dark:bg-gray-700" />
         ) : (
-          <p className="text-lg font-bold dark:text-white">
-            {formatScaledRupiah(value ?? 0)}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-bold dark:text-white">
+              {formatScaledRupiah(value)}
+            </p>
+            {action && <div>{action}</div>}
+          </div>
+        )}
+
+        {footer && footerPosition === 'inside' && (
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {footer}
+          </div>
         )}
       </CardBody>
-      {footer && (
+
+      {footer && footerPosition === 'bottom' && (
         <CardFooter className="flex flex-col items-start space-y-2">
           {footer}
         </CardFooter>

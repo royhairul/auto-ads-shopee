@@ -15,6 +15,11 @@ export interface ShopeeCampaign {
   spent: number
   state: string
   daily_budget: number
+  report: {
+    broad_gmv: number
+    direct_gmv: number
+    roas: number
+  }
 }
 
 export interface CampaignDailyBudget {

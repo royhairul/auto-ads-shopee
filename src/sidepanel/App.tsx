@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Tooltip, Button, Image, Spinner, Switch } from '@heroui/react'
+import {
+  Tooltip,
+  Button,
+  Image,
+  Spinner,
+  Switch,
+  Select,
+  SelectItem,
+} from '@heroui/react'
 import {
   IconRefresh,
   IconSun,
@@ -32,6 +40,7 @@ export default function App() {
   const [isDark, setIsDark] = useState(false)
   const [isActive, setIsActive] = useState(true)
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null)
+  const [filterStatus, setFilterStatus] = useState<string>('ongoing')
 
   // === Load Dark Mode & Extension Status dari Storage saat awal ===
   useEffect(() => {
@@ -76,13 +85,19 @@ export default function App() {
   })
 
   const campaignQuery = useQuery<CampaignResponse>({
-    queryKey: ['shopeeCampaign'],
+    queryKey: ['shopeeCampaign', filterStatus],
     queryFn: async () => {
-      const data = await getShopeeCampaign()
+      const data = await getShopeeCampaign(filterStatus)
       return { campaigns: data?.campaigns ?? [] }
     },
     refetchInterval: 600_000,
   })
+
+  const campaigns = campaignQuery.data?.campaigns ?? []
+  const filteredCampaigns =
+    filterStatus === 'all'
+      ? campaigns
+      : campaigns.filter((c) => c.state === filterStatus)
 
   // === Manual Refresh Handler ===
   const handleRefresh = useCallback(async () => {
@@ -93,6 +108,10 @@ export default function App() {
     ])
     setLastRefreshed(new Date())
   }, [profileQuery, todayQuery, campaignQuery])
+
+  useEffect(() => {
+    campaignQuery.refetch()
+  }, [filterStatus])
 
   // === Force Check dari Background ===
   const handleForceCheck = async () => {
@@ -136,7 +155,7 @@ export default function App() {
 
   if (!profileQuery.data?.is_seller) {
     return (
-      <div className="mt-10 p-5 flex flex-col gap-3 items-center text-center">
+      <div className="mt-10 py-5 px-3 flex flex-col gap-3 items-center text-center">
         <Image
           src="/icons/logo128.png"
           alt="Shopee Logo"
@@ -269,20 +288,37 @@ export default function App() {
         value={todayQuery.data?.expenseToday}
         loading={todayQuery.isLoading}
         colorScheme="danger"
-        footer={
-          <>
-            {lastRefreshed && (
-              <p className="ml-auto flex gap-2 items-center text-xs text-default-500">
-                <IconHistory size={14} />
-                <span>{lastRefreshed.toLocaleTimeString()}</span>
-              </p>
-            )}
-            <CampaignList
-              campaigns={campaignQuery.data?.campaigns ?? []}
-              loading={campaignQuery.isLoading}
-            />
-          </>
-        }
+      />
+
+      {/* Filter Status */}
+      <div className="w-full flex justify-between items-center gap-2">
+        <Select
+          label="Status"
+          size="sm"
+          variant="faded"
+          selectedKeys={[filterStatus]}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="max-w-[160px]"
+        >
+          <SelectItem key="all">Semua</SelectItem>
+          <SelectItem key="ongoing">Berjalan</SelectItem>
+          <SelectItem key="paused">Dijeda</SelectItem>
+          <SelectItem key="ended">Berakhir</SelectItem>
+        </Select>
+
+        {lastRefreshed && (
+          <p className="ml-auto flex gap-2 items-center text-xs text-default-500">
+            <IconHistory size={14} />
+            <span>{lastRefreshed.toLocaleTimeString()}</span>
+          </p>
+        )}
+      </div>
+
+      {/* Campaign List di luar StatsCard */}
+      <CampaignList
+        campaigns={filteredCampaigns}
+        loading={campaignQuery.isLoading}
+        onRefresh={handleRefresh}
       />
     </div>
   )

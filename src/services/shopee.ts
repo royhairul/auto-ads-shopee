@@ -61,7 +61,7 @@ export async function getShopeeTodayData() {
 
 // === Ambil daftar campaign Shopee ===
 export async function getShopeeCampaign(
-  filter: string | null = 'ongoing'
+  status: string | null = 'ongoing'
 ): Promise<{ campaigns: ShopeeCampaign[] }> {
   const url =
     'https://seller.shopee.co.id/api/pas/v1/homepage/query/?SPC_CDS=b6be0576-3372-4ae7-8782-9da0f4815c2f&SPC_CDS_VER=2'
@@ -94,7 +94,7 @@ export async function getShopeeCampaign(
     filter_list: [
       {
         campaign_type: 'live_stream_homepage',
-        state: 'all',
+        state: status, // ambil dari parameter
         search_term: '',
         is_valid_rebate_only: false,
       },
@@ -115,16 +115,27 @@ export async function getShopeeCampaign(
     const entryList = json?.data?.entry_list ?? []
 
     // 🔹 Ambil semua campaign dasar
-    let campaigns: ShopeeCampaign[] = entryList.map((entry: any) => ({
-      id: entry.campaign?.campaign_id ?? entry.title,
-      title: entry.title,
-      spent: entry.report?.cost ?? 0,
-      state: entry.state ?? 'paused',
-      daily_budget: entry.campaign?.daily_budget ?? 0,
-    }))
+    let campaigns: ShopeeCampaign[] = entryList.map((entry: any) => {
+      const broad_gmv = entry.report?.broad_gmv ?? 0
+      const direct_gmv = entry.report?.direct_gmv ?? 0
+      const spent = entry.report?.cost ?? 0
+
+      return {
+        id: entry.campaign?.campaign_id ?? entry.id ?? 0,
+        title: entry.title ?? 'Untitled Campaign',
+        spent,
+        state: entry.state ?? 'paused',
+        daily_budget: entry.campaign?.daily_budget ?? 0,
+        report: {
+          broad_gmv,
+          direct_gmv,
+          roas: spent > 0 ? broad_gmv / spent : 0,
+        },
+      }
+    })
 
     // 🔹 Update spent untuk campaign ongoing (gunakan Promise.all agar paralel)
-    const updatedCampaigns = await Promise.all(
+    await Promise.all(
       campaigns.map(async (item) => {
         if (item.state === 'ongoing') {
           try {
@@ -144,9 +155,9 @@ export async function getShopeeCampaign(
     )
 
     // 🔹 Filter berdasarkan parameter (misal 'ongoing', 'paused', dll)
-    const filtered = updatedCampaigns.filter((c) => c.state === filter)
+    // const filtered = updatedCampaigns.filter((c) => c.state === status)
 
-    return { campaigns: filtered }
+    return { campaigns }
   } catch (err) {
     console.error('❌ [UTIL] Gagal ambil campaign Shopee:', err)
     return { campaigns: [] }
@@ -227,6 +238,31 @@ export async function updateDailyBudget(
     return await res.json()
   } catch (err) {
     console.error('❌ [UTIL] Gagal ubah budget campaign:', err)
+    return null
+  }
+}
+
+export async function updateStatusCampaign(campaignId: number, status: string) {
+  const payload = {
+    campaign_id: campaignId,
+    type: status,
+    header: {},
+  }
+
+  try {
+    const response = await fetch(
+      'https://seller.shopee.co.id/api/pas/v1/live_stream/edit/?SPC_CDS=050e1e2c-14da-4838-ac1e-4e4420f9ff45&SPC_CDS_VER=2',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      }
+    )
+
+    return await response.json()
+  } catch (error) {
+    console.error('❌ [UTIL] Gagal update status campaign:', error)
     return null
   }
 }

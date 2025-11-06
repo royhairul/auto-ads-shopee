@@ -19,12 +19,14 @@ import {
   IconAlertTriangleFilled,
   IconCash,
   IconSquareRoundedPlusFilled,
+  IconCircleDashedCheck,
 } from '@tabler/icons-react'
 
 import {
   getProfile,
   getShopeeTodayData,
   getShopeeCampaign,
+  formatScaledRupiah,
 } from '@/services/shopee'
 import ProfileCard from '@/components/Sidepanel/ProfileCard'
 import StatsCard from '@/components/Sidepanel/StatsCard'
@@ -41,6 +43,8 @@ export default function App() {
   const [isActive, setIsActive] = useState(true)
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>('ongoing')
+  const [effectivenessThreshold, setEffectivenessThreshold] =
+    useState<number>(20)
 
   // === Load Dark Mode & Extension Status dari Storage saat awal ===
   useEffect(() => {
@@ -50,6 +54,10 @@ export default function App() {
       setIsDark(darkMode)
       setIsActive(active)
       document.documentElement.classList.toggle('dark', darkMode)
+    })
+
+    chrome.storage.sync.get(['effectivenessThreshold'], (result) => {
+      setEffectivenessThreshold(result.effectivenessThreshold ?? 20)
     })
   }, [])
 
@@ -99,13 +107,22 @@ export default function App() {
       ? campaigns
       : campaigns.filter((c) => c.state === filterStatus)
 
-  // === Manual Refresh Handler ===
   const handleRefresh = useCallback(async () => {
+    // Refetch API
     await Promise.all([
       profileQuery.refetch(),
       todayQuery.refetch(),
       campaignQuery.refetch(),
     ])
+
+    // Update effectiveness threshold dari storage
+    const storageData: any = await new Promise((resolve) => {
+      chrome.storage.sync.get(['effectivenessThreshold'], (result) =>
+        resolve(result)
+      )
+    })
+
+    setEffectivenessThreshold(storageData.effectivenessThreshold ?? 20)
     setLastRefreshed(new Date())
   }, [profileQuery, todayQuery, campaignQuery])
 
@@ -122,9 +139,9 @@ export default function App() {
     }
   }
 
-  // === Auto Refresh setiap 5 menit ===
+  // === Auto Refresh setiap 1 menit ===
   useEffect(() => {
-    const interval = setInterval(handleRefresh, 300_000)
+    const interval = setInterval(handleRefresh, 60_000)
     return () => clearInterval(interval)
   }, [handleRefresh])
 
@@ -197,6 +214,14 @@ export default function App() {
   }
 
   const isSaldoHabis = (todayQuery.data?.accountBalance ?? 0) <= 0
+
+  // Hitung rata-rata efektivitas
+  const activeCampaign = campaigns.filter((c) => c.state === 'ongoing')
+  const effectiveness =
+    activeCampaign.length > 0
+      ? activeCampaign.reduce((total, c) => total + (c.report.roas || 0), 0) /
+        activeCampaign.length
+      : 0
 
   // === UI Utama ===
   return (
@@ -285,9 +310,30 @@ export default function App() {
       <StatsCard
         title="Biaya Hari Ini"
         icon={IconCash}
-        value={todayQuery.data?.expenseToday}
+        colorScheme={`${
+          effectiveness < effectivenessThreshold ? 'danger' : 'default'
+        }`}
+        value={
+          <div className="w-full flex justify-between font-semibold text-lg">
+            <span>{formatScaledRupiah(todayQuery.data?.expenseToday)}</span>
+            <span
+              className={`gap-2 flex items-center text-sm
+                ${
+                  effectiveness >= effectivenessThreshold
+                    ? 'text-green-500'
+                    : 'text-red-500'
+                }`}
+            >
+              {effectiveness < effectivenessThreshold ? (
+                <IconAlertTriangleFilled size={16} />
+              ) : (
+                <IconCircleDashedCheck size={16} />
+              )}
+              {effectiveness.toFixed(2)}
+            </span>
+          </div>
+        }
         loading={todayQuery.isLoading}
-        colorScheme="danger"
       />
 
       {/* Filter Status */}
@@ -298,7 +344,7 @@ export default function App() {
           variant="faded"
           selectedKeys={[filterStatus]}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="max-w-[160px]"
+          className="max-w-40"
         >
           <SelectItem key="all">Semua</SelectItem>
           <SelectItem key="ongoing">Berjalan</SelectItem>
@@ -316,6 +362,7 @@ export default function App() {
 
       {/* Campaign List di luar StatsCard */}
       <CampaignList
+        effectivenessThreshold={effectivenessThreshold}
         campaigns={filteredCampaigns}
         loading={campaignQuery.isLoading}
         onRefresh={handleRefresh}

@@ -17,6 +17,7 @@ import {
   Divider,
   Spinner,
   Tooltip,
+  Link,
 } from '@heroui/react'
 import {
   IconDotsVertical,
@@ -33,6 +34,7 @@ type Props = {
   campaigns?: ShopeeCampaign[]
   loading?: boolean
   onRefresh?: () => void
+  effectivenessThreshold: number
 }
 
 type UpdatingState = {
@@ -44,6 +46,7 @@ export default function CampaignList({
   campaigns = [],
   loading = false,
   onRefresh,
+  effectivenessThreshold = 20,
 }: Props) {
   const [updating, setUpdating] = useState<UpdatingState>(null)
   const queryClient = useQueryClient()
@@ -72,7 +75,7 @@ export default function CampaignList({
 
   if (!campaigns.length)
     return (
-      <span className="w-full text-center text-default-700 dark:text-gray-400 text-xs py-5 bg-gray-100 dark:bg-gray-800 rounded-md border-1 border-dashed border-default-300 dark:border-gray-600">
+      <span className="w-full text-center text-default-700/60 dark:text-gray-400/60 text-xs py-5 bg-gray-100 dark:bg-gray-800/60 rounded-md border-1 border-dashed border-default-300 dark:border-gray-600">
         Tidak ada campaign
       </span>
     )
@@ -91,7 +94,6 @@ export default function CampaignList({
           <div key={c.id} className="flex flex-col w-full">
             {/* === Header Campaign === */}
             <div className="flex justify-between items-center w-full">
-              {/* === Progress Ring di sebelah kiri === */}
               <div
                 className="w-12 h-12 shrink-0 mr-3"
                 onMouseDown={(e) => e.preventDefault()}
@@ -167,9 +169,16 @@ export default function CampaignList({
                 </span>
 
                 <div className="flex justify-between py-1 gap-1">
-                  <span className="font-semibold text-default-600 dark:text-gray-300 truncate max-w-[140px]">
-                    {c.title || 'Tanpa Judul'}
-                  </span>
+                  <Link
+                    color="foreground"
+                    size="sm"
+                    isExternal
+                    href={`https://seller.shopee.co.id/portal/marketing/pas/live-stream/detail/${c.id}`}
+                  >
+                    <span className="font-semibold text-default-600 dark:text-gray-300 truncate max-w-[140px]">
+                      {c.title || 'Tanpa Judul'}
+                    </span>
+                  </Link>
                   <span className="font-medium text-default-700 dark:text-gray-100">
                     {formatScaledRupiah(c.spent)}
                   </span>
@@ -184,10 +193,8 @@ export default function CampaignList({
                   <span>Efektivitas Iklan</span>
                   <span
                     className={
-                      c.report.roas >= 4
+                      c.report.roas >= effectivenessThreshold
                         ? 'text-green-500 font-medium'
-                        : c.report.roas >= 2
-                        ? 'text-yellow-500 font-medium'
                         : 'text-red-500 font-medium'
                     }
                   >

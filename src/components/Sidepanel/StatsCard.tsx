@@ -6,7 +6,7 @@ import clsx from 'clsx'
 interface StatsCardProps {
   title: string
   icon: React.ElementType
-  value?: number
+  value?: React.ReactNode
   loading?: boolean
   colorScheme?: 'primary' | 'success' | 'warning' | 'danger' | 'default'
   footer?: React.ReactNode
@@ -34,7 +34,8 @@ export default function StatsCard({
       'bg-green-600/5 dark:bg-green-600/15 text-green-600 dark:text-green-400',
     warning:
       'bg-yellow-600/5 dark:bg-yellow-600/15 text-yellow-600 dark:text-yellow-400',
-    danger: 'bg-red-600/5 dark:bg-red-600/15 text-red-600 dark:text-red-400',
+    danger:
+      'bg-red-600/5 dark:bg-red-600/15 text-red-600 dark:text-red-400 shadow-lg shadow-red-500/25 dark:shadow-red-400/30 border-[1.5px] border-red-400/30 dark:border-red-400/30',
     default:
       'bg-gray-600/5 dark:bg-gray-600/15 text-gray-600 dark:text-gray-400',
   }
@@ -56,9 +57,13 @@ export default function StatsCard({
           <Skeleton className="w-24 h-6 rounded-md dark:bg-gray-700" />
         ) : (
           <div className="flex items-center justify-between">
-            <p className="text-lg font-bold dark:text-white">
-              {formatScaledRupiah(value)}
-            </p>
+            {typeof value === 'number' ? (
+              <p className="text-lg font-bold dark:text-white">
+                {typeof value === 'number' ? formatScaledRupiah(value) : value}
+              </p>
+            ) : (
+              value
+            )}
             {action && <div>{action}</div>}
           </div>
         )}

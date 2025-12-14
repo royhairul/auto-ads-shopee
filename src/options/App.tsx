@@ -7,10 +7,12 @@ import {
   IconLayoutBottombarCollapseFilled,
   IconLayoutSidebarRightCollapseFilled,
   IconBell,
+  IconBug,
 } from '@tabler/icons-react'
 import SettingsTab from './tabs/SettingsTab'
 import AboutTab from './tabs/AboutTab'
 import NotificationTab from './tabs/NotificationTab'
+import ErrorLogsTab from './tabs/ErrorLogsTab'
 
 export default function App() {
   const [isVertical, setIsVertical] = useState(true)
@@ -77,6 +79,20 @@ export default function App() {
           className="w-full"
         >
           <NotificationTab />
+        </Tab>
+
+        {/* Tab: Error Logs */}
+        <Tab
+          key="errorLogs"
+          title={
+            <div className="flex items-center space-x-2">
+              <IconBug size={18} />
+              <span>Error Logs</span>
+            </div>
+          }
+          className="w-full"
+        >
+          <ErrorLogsTab />
         </Tab>
 
         {/* Tab: About */}

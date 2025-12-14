@@ -33,3 +33,12 @@ export interface CampaignDailyBudget {
   previous_expense: number
   recommended: number
 }
+
+export interface ShopeeLiveData {
+  sessionId: number
+  title: string
+  status: number
+  link: string
+  gmv: number
+  view: number
+}

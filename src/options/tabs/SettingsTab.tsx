@@ -126,19 +126,10 @@ export default function SettingsTab({ onSaved }: SettingsTabProps) {
       const text = await navigator.clipboard.readText()
       const parsed = JSON.parse(text)
       reset(parsed)
-      chrome.storage.sync.set(parsed, () => {
-        addToast({
-          title: 'Pengaturan ditempel dan disimpan',
-          description:
-            'Semua pengaturan berhasil dimuat dan disimpan ke akun ini.',
-          color: 'success',
-          timeout: 3000,
-          shouldShowTimeoutProgress: true,
-        })
-      })
       addToast({
         title: 'Pengaturan ditempel',
-        description: 'Semua pengaturan berhasil dimuat dari clipboard.',
+        description:
+          'Semua pengaturan berhasil dimuat dari clipboard. Klik "Simpan Pengaturan" untuk menyimpan.',
         color: 'success',
       })
     } catch (err) {

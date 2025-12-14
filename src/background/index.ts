@@ -2,7 +2,7 @@
 // 🔹 Auto Ads Shopee - Background Service Worker
 // ==========================================================
 
-import { setupErrorHandlers } from './errorHandlers'
+import { setupGlobalErrorHandlers } from './logger'
 import { setupLifecycleEvents } from './lifecycleEvents'
 import { setupMessageHandlers } from './messageHandlers'
 import { setupAlarmListener } from './alarmListener'
@@ -11,8 +11,8 @@ import { setupAlarmListener } from './alarmListener'
 // 🔹 Initialize Extension
 // ==========================================================
 
-// Setup global error handlers
-setupErrorHandlers()
+// Setup global error handlers with persistent logging
+setupGlobalErrorHandlers()
 
 // Setup lifecycle events (onInstalled, onStartup)
 setupLifecycleEvents()

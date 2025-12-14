@@ -3,6 +3,7 @@ import type {
   ShopeeCampaign,
   ShopeeUser,
 } from '@/types/shopee'
+import { logError } from '@/background/logger'
 
 // === [UTILS] Shopee API & Helper ===
 export function formatScaledRupiah(value: number | null | undefined) {
@@ -21,6 +22,7 @@ export async function getProfile(): Promise<ShopeeUser | null> {
     return json?.data as ShopeeUser
   } catch (error) {
     console.error('[EXT] Error mengambil data profile:', error)
+    await logError(error, { function: 'getProfile', url })
     return null
   }
 }
@@ -55,6 +57,7 @@ export async function getShopeeTodayData() {
     }
   } catch (err) {
     console.error('❌ [UTIL] Gagal ambil Shopee Today Data:', err)
+    await logError(err, { function: 'getShopeeTodayData', url })
     return null
   }
 }
@@ -160,6 +163,7 @@ export async function getShopeeCampaign(
     return { campaigns }
   } catch (err) {
     console.error('❌ [UTIL] Gagal ambil campaign Shopee:', err)
+    await logError(err, { function: 'getShopeeCampaign', status, url })
     return { campaigns: [] }
   }
 }
@@ -204,6 +208,10 @@ export async function getActiveCampaignSpent(
     return campaignDailyBudget
   } catch (error) {
     console.error('❌ [UTIL] Gagal fetch budget campaign:', error)
+    await logError(error, {
+      function: 'getActiveCampaignSpent',
+      campaignIds: payload.campaign_id_list,
+    })
     return null
   }
 }
@@ -238,6 +246,11 @@ export async function updateDailyBudget(
     return await res.json()
   } catch (err) {
     console.error('❌ [UTIL] Gagal ubah budget campaign:', err)
+    await logError(err, {
+      function: 'updateDailyBudget',
+      campaignId,
+      dailyBudgetRupiah,
+    })
     return null
   }
 }
@@ -263,6 +276,11 @@ export async function updateStatusCampaign(campaignId: number, status: string) {
     return await response.json()
   } catch (error) {
     console.error('❌ [UTIL] Gagal update status campaign:', error)
+    await logError(error, {
+      function: 'updateStatusCampaign',
+      campaignId,
+      status,
+    })
     return null
   }
 }

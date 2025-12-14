@@ -101,7 +101,7 @@ export default function NotificationTab() {
           </div>
 
           {/* 🔹 Input jeda notifikasi */}
-          <Input
+          {/* <Input
             {...register('notificationCooldown', { valueAsNumber: true })}
             label="Jeda Notifikasi (menit)"
             type="number"
@@ -113,7 +113,7 @@ export default function NotificationTab() {
             endContent={
               <span className="text-default-400 text-small">Menit</span>
             }
-          />
+          /> */}
         </CardBody>
 
         <CardFooter className="flex gap-3 mt-2">

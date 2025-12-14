@@ -8,10 +8,8 @@ import { getActiveLive } from '@/services/shopee/live'
 import { handleDailyReset } from './dailyReset'
 import { clearAlarm } from './alarms'
 import {
-  ANTI_DOUBLE_UPDATE_MINUTES,
   DEFAULT_BUDGET_THRESHOLD,
   DEFAULT_UPDATE_INTERVAL,
-  DEFAULT_NOTIFICATION_COOLDOWN,
   DEFAULT_EFFECTIVENESS_THRESHOLD,
   DEFAULT_MODE,
   DEFAULT_DAILY_BUDGET,
@@ -106,7 +104,6 @@ export async function checkShopeeCampaigns() {
     const {
       budgetThreshold = DEFAULT_BUDGET_THRESHOLD,
       updateInterval = DEFAULT_UPDATE_INTERVAL,
-      notificationCooldown = DEFAULT_NOTIFICATION_COOLDOWN,
       notificationEnabled = true,
       effectivenessThreshold = DEFAULT_EFFECTIVENESS_THRESHOLD, // 🔹 Ambang efektivitas
       mode = DEFAULT_MODE,
@@ -122,9 +119,7 @@ export async function checkShopeeCampaigns() {
       'lastUpdateTime',
     ])
 
-    const NOTIFICATION_COOLDOWN = notificationCooldown * 60 * 1000
     const UPDATE_INTERVAL_MS = updateInterval * 60 * 1000
-    const ANTI_DOUBLE_UPDATE_MS = ANTI_DOUBLE_UPDATE_MINUTES * 60 * 1000
     const now = Date.now()
 
     console.log(
@@ -148,10 +143,6 @@ export async function checkShopeeCampaigns() {
 
     for (const c of campaigns) {
       const percent = (c.spent / c.daily_budget) * 100
-      const lastNotified = notifiedCampaigns[c.id] || 0
-      const lastUpdated = updatedCampaignsMap[c.id] || 0
-      const lastBudget = lastBudgets[c.id] || 0
-      const cooldownPassed = now - lastNotified > NOTIFICATION_COOLDOWN
 
       // ==================================================
       // 🔸 CEK EFEKTIVITAS IKLAN RENDAH
@@ -160,7 +151,7 @@ export async function checkShopeeCampaigns() {
         c.report.roas !== undefined &&
         c.report.roas < effectivenessThreshold
       ) {
-        if (notificationEnabled && cooldownPassed) {
+        if (notificationEnabled) {
           console.warn(
             `⚠️ Efektivitas rendah (${c.report.roas}) pada ${c.title}`
           )
@@ -196,34 +187,27 @@ export async function checkShopeeCampaigns() {
           now - lastUpdateTime >= UPDATE_INTERVAL_MS
       }
 
-      const recentlyUpdated = now - lastUpdated < ANTI_DOUBLE_UPDATE_MS
-      if (recentlyUpdated || c.daily_budget <= lastBudget) {
-        console.log(
-          `⏸️ Skip ${c.title} — sudah diperbarui dalam ${ANTI_DOUBLE_UPDATE_MINUTES} menit terakhir.`
-        )
-        continue
-      }
-
       if (!shouldUpdate) continue
 
-      const currentBudget = c.daily_budget / 100000
-      const newBudget = currentBudget + dailyBudget
-      const budgetDifference = newBudget - currentBudget
+      const budgetDifference = c.daily_budget - c.spent
 
-      // 🔹 Khusus mode "time": cek apakah selisih antara budget baru dan current masih < dailyBudget
-      if (mode === 'time' && budgetDifference >= dailyBudget) {
+      if (mode === 'time' && budgetDifference >= dailyBudget * 100_000) {
         console.log(
-          `⏸️ Skip ${
-            c.title
-          } (mode: time) — selisih budget (Rp${budgetDifference.toLocaleString()}) sudah mencapai atau melebihi Rp${dailyBudget.toLocaleString()}`
+          `⏸️ Skip ${c.title} (mode: time) — selisih budget (Rp${(
+            budgetDifference / 100_000
+          ).toLocaleString()}) sudah mencapai atau melebihi Rp${dailyBudget.toLocaleString()}`
         )
         continue
       }
 
+      const newBudget = c.daily_budget / 100_000 + dailyBudget
+
       console.log(
-        `💰 Update ${
-          c.title
-        } dari Rp${currentBudget.toLocaleString()} → Rp${newBudget.toLocaleString()}`
+        `💰 Update ${c.title} dari Rp${(
+          c.spent / 100_000
+        ).toLocaleString()} → Rp${(
+          newBudget / 100_000
+        ).toLocaleString()} (${percent.toFixed(2)}% spent}`
       )
 
       const result = await updateDailyBudget(c.id, newBudget)
@@ -237,7 +221,7 @@ export async function checkShopeeCampaigns() {
           await chrome.storage.sync.set({ lastUpdateTime: now })
         }
 
-        if (notificationEnabled && cooldownPassed) {
+        if (notificationEnabled) {
           const title =
             mode === 'percentage' ||
             (mode === 'combined' && percent >= budgetThreshold)

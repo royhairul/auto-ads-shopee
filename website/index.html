@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Auto Ads Shopee - Ekstensi Chrome untuk memantau iklan Shopee dan menampilkan notifikasi otomatis.">
+    <meta name="keywords" content="shopee, auto ads, chrome extension, iklan shopee">
+    <meta name="author" content="Roy Hairul">
+    <title>Auto Ads Shopee - Download Extension</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="assets/logo128.png">
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="bg-pattern"></div>
+    <div class="floating-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <img src="assets/logo128.png" alt="Logo" class="logo-img">
+                <span class="logo-text">Auto Ads Shopee</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Fitur</a>
+                <a href="#download" class="nav-link">Download</a>
+                <a href="#releases" class="nav-link">Releases</a>
+                <a href="https://github.com/royhairul/auto-ads-shopee" target="_blank"
+                    class="nav-link nav-github">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero" id="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge"><svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" width="18" height="18">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg><span>Chrome Extension</span></div>
+                <h1 class="hero-title"><span class="title-gradient">Auto Ads</span> <span
+                        class="title-shopee">Shopee</span></h1>
+                <p class="hero-description">Pantau iklan Shopee secara otomatis dan dapatkan notifikasi real-time.
+                    Tingkatkan efisiensi pengelolaan iklan dengan ekstensi Chrome ini.</p>
+                <div class="hero-actions">
+                    <a href="#download" class="btn btn-primary" id="hero-download-btn">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            width="20" height="20">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        <span>Download Sekarang</span>
+                        <span class="btn-version" id="hero-version">v1.0.2</span>
+                    </a>
+                    <a href="#features" class="btn btn-secondary">
+                        <span>Lihat Fitur</span>
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            width="18" height="18">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat"><span class="stat-value" id="total-downloads">--</span><span
+                            class="stat-label">Downloads</span></div>
+                    <div class="stat-divider"></div>
+                    <div class="stat"><span class="stat-value" id="total-releases">--</span><span
+                            class="stat-label">Releases</span></div>
+                    <div class="stat-divider"></div>
+                    <div class="stat"><span class="stat-value">100%</span><span class="stat-label">Gratis</span></div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="extension-preview">
+                    <div class="preview-header">
+                        <div class="preview-dots"><span></span><span></span><span></span></div>
+                    </div>
+                    <div class="preview-content"><img src="assets/logo128.png" alt="Preview" class="preview-logo"></div>
+                </div>
+                <div class="glow-effect"></div>
+            </div>
+        </div>
+    </header>
+
+    <section class="features" id="features">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-tag">Fitur Unggulan</span>
+                <h2 class="section-title">Mengapa Auto Ads Shopee?</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg></div>
+                    <h3>Notifikasi Real-time</h3>
+                    <p>Dapatkan notifikasi instan saat ada perubahan iklan.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg></div>
+                    <h3>Monitoring Otomatis</h3>
+                    <p>Pantau performa iklan secara otomatis.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
+                        </svg></div>
+                    <h3>Analitik Visual</h3>
+                    <p>Lihat statistik dalam bentuk grafik.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg></div>
+                    <h3>Aman & Privat</h3>
+                    <p>Data Anda tetap aman dan privat.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                            <line x1="3" y1="9" x2="21" y2="9" />
+                            <line x1="9" y1="21" x2="9" y2="9" />
+                        </svg></div>
+                    <h3>Side Panel UI</h3>
+                    <p>Interface terintegrasi dengan browser.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                        </svg></div>
+                    <h3>Open Source</h3>
+                    <p>Kode sumber terbuka di GitHub.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="download" id="download">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-tag">Download</span>
+                <h2 class="section-title">Download Versi Terbaru</h2>
+            </div>
+            <div class="download-card" id="latest-release-card">
+                <div class="download-loading" id="download-loading">
+                    <div class="spinner"></div><span>Memuat release...</span>
+                </div>
+                <div class="download-content" id="download-content" style="display:none;">
+                    <div class="download-header">
+                        <div class="version-badge" id="latest-version">v1.0.0</div>
+                        <span class="release-date" id="latest-date">--</span>
+                    </div>
+                    <h3 class="download-title" id="latest-title">--</h3>
+                    <div class="release-notes" id="latest-notes"></div>
+                    <div class="download-actions">
+                        <a href="#" class="btn btn-download" id="latest-download-btn">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                width="20" height="20">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>Download .zip</span>
+                            <span class="btn-size" id="latest-size">--</span>
+                        </a>
+                        <a href="#" class="btn btn-outline" id="latest-github-btn" target="_blank">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                                <path
+                                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                            </svg>
+                            <span>Lihat di GitHub</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="download-error" id="download-error" style="display:none;">
+                    <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        width="48" height="48">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <h3>Belum Ada Release</h3>
+                    <p>Saat ini belum ada release yang tersedia untuk diunduh.</p>
+                    <a href="https://github.com/royhairul/auto-ads-shopee/releases" class="btn btn-outline">Buka
+                        GitHub</a>
+                </div>
+            </div>
+            <div class="install-guide">
+                <h3 class="guide-title">Cara Install</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Download & Extract</h4>
+                            <p>Download dan extract file .zip</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Buka Extensions</h4>
+                            <p>Buka <code>chrome://extensions/</code></p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Developer Mode</h4>
+                            <p>Aktifkan Developer mode</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Load Extension</h4>
+                            <p>Klik "Load unpacked"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="releases" id="releases">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-tag">Riwayat Versi</span>
+                <h2 class="section-title">Semua Releases</h2>
+            </div>
+            <div class="releases-list" id="releases-list">
+                <div class="releases-loading" id="releases-loading">
+                    <div class="spinner"></div><span>Memuat releases...</span>
+                </div>
+            </div>
+            <div class="releases-pagination" id="releases-pagination" style="display:none;"><button
+                    class="btn btn-outline" id="load-more-btn">Load More</button></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-main"><img src="assets/logo128.png" alt="Logo" class="footer-logo"><span>Auto Ads
+                    Shopee</span></div>
+            <div class="footer-links"><a href="https://github.com/royhairul/auto-ads-shopee"
+                    target="_blank">GitHub</a><a href="https://github.com/royhairul/auto-ads-shopee/issues"
+                    target="_blank">Report Bug</a></div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Auto Ads Shopee. MIT License. Made with ❤️ by <a href="https://github.com/royhairul">Roy
+                    Hairul</a></p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+
+</html>

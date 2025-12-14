@@ -1,11 +1,3 @@
-import {
-  RadialBarChart,
-  RadialBar,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Label,
-  PolarGrid,
-} from 'recharts'
 import { ShopeeCampaign } from '@/types/shopee'
 import SkeletonStack from './SkeletonStack'
 import { formatScaledRupiah } from '@/services/shopee'
@@ -14,17 +6,17 @@ import {
   PopoverContent,
   PopoverTrigger,
   Button,
-  Divider,
   Spinner,
   Tooltip,
   Link,
+  Progress,
 } from '@heroui/react'
 import {
-  IconDotsVertical,
   IconPlayerStopFilled,
   IconPlayerPauseFilled,
   IconPlayerPlayFilled,
   IconReload,
+  IconCaretDownFilled,
 } from '@tabler/icons-react'
 import { useState } from 'react'
 import { updateStatusCampaign } from '@/services/shopee'
@@ -81,84 +73,42 @@ export default function CampaignList({
     )
 
   return (
-    <div className="flex flex-col w-full">
-      {campaigns.map((c, idx) => {
+    <div className="flex flex-col w-full gap-3">
+      {campaigns.map((c) => {
         const rawPercent = c.daily_budget ? (c.spent / c.daily_budget) * 100 : 0
         const percentSpent = Math.min(rawPercent, 100)
-        const chartData = [{ name: 'Spent', visitors: percentSpent }]
 
         const isUpdating = (action: 'resume' | 'pause' | 'stop') =>
           updating?.campaignId === c.id && updating.action === action
 
         return (
-          <div key={c.id} className="flex flex-col w-full">
-            {/* === Header Campaign === */}
-            <div className="flex justify-between items-center w-full">
-              <div
-                className="w-12 h-12 shrink-0 mr-3"
-                onMouseDown={(e) => e.preventDefault()}
+          <div
+            key={c.id}
+            className="flex flex-col w-full p-3 rounded-lg bg-default-50 dark:bg-gray-800/40 border border-default-200 dark:border-gray-700"
+          >
+            {/* === Header: Title + Status === */}
+            <div className="flex items-center justify-between mb-2">
+              <Link
+                color="foreground"
+                size="sm"
+                isExternal
+                href={`https://seller.shopee.co.id/portal/marketing/pas/live-stream/detail/${c.id}`}
+                className="flex-1 min-w-0"
               >
-                <RadialBarChart
-                  width={56}
-                  height={56}
-                  innerRadius={20}
-                  outerRadius={24}
-                  data={chartData}
-                  startAngle={90}
-                  endAngle={-270}
-                >
-                  <PolarGrid radialLines={false} />
-                  <PolarAngleAxis
-                    type="number"
-                    domain={[0, 100]}
-                    tick={false}
-                  />
-                  <RadialBar
-                    dataKey="visitors"
-                    cornerRadius={10}
-                    background
-                    fill={percentSpent >= 100 ? '#22c55e' : '#f87171'}
-                  />
-                  <PolarRadiusAxis tick={false} axisLine={false}>
-                    <Label
-                      content={({ viewBox }) => {
-                        if (
-                          !viewBox ||
-                          !('cx' in viewBox) ||
-                          !('cy' in viewBox)
-                        )
-                          return null
-                        const fontSize = percentSpent >= 100 ? 8 : 12
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            tabIndex={-1}
-                            style={{ fontSize }}
-                            className="font-medium fill-default-700 dark:fill-gray-100"
-                          >
-                            {rawPercent < 1
-                              ? '<1%'
-                              : Math.round(rawPercent) + '%'}
-                          </text>
-                        )
-                      }}
-                    />
-                  </PolarRadiusAxis>
-                </RadialBarChart>
-              </div>
+                <span className="font-semibold text-sm text-default-700 dark:text-gray-200 truncate block">
+                  {c.title || 'Tanpa Judul'}
+                </span>
+              </Link>
 
-              {/* === Info Campaign === */}
-              <div className="flex-1 flex flex-col justify-start">
+              {/* Status Badge + Action */}
+              <div className="flex items-center gap-1 ml-2">
                 <span
-                  className={`w-max text-xs font-medium px-1 py-0.5 rounded ${
+                  className={`text-xs font-medium px-2 py-1 rounded-full ${
                     c.state === 'ongoing'
-                      ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400'
                       : c.state === 'paused'
-                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
-                      : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'
+                      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-400'
+                      : 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400'
                   }`}
                 >
                   {c.state === 'ongoing'
@@ -168,158 +118,167 @@ export default function CampaignList({
                     : 'Berakhir'}
                 </span>
 
-                <div className="flex justify-between py-1 gap-1">
-                  <Link
-                    color="foreground"
-                    size="sm"
-                    isExternal
-                    href={`https://seller.shopee.co.id/portal/marketing/pas/live-stream/detail/${c.id}`}
-                  >
-                    <span className="font-semibold text-default-600 dark:text-gray-300 truncate max-w-[140px]">
-                      {c.title || 'Tanpa Judul'}
-                    </span>
-                  </Link>
-                  <span className="font-medium text-default-700 dark:text-gray-100">
-                    {formatScaledRupiah(c.spent)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between text-xs text-default-600 dark:text-gray-400 pb-1">
-                  <span>Budget Harian</span>
-                  <span>{formatScaledRupiah(c.daily_budget)}</span>
-                </div>
-
-                <div className="flex justify-between text-xs text-default-600 dark:text-gray-400">
-                  <span>Efektivitas Iklan</span>
-                  <span
-                    className={
-                      c.report.roas >= effectivenessThreshold
-                        ? 'text-green-500 font-medium'
-                        : 'text-red-500 font-medium'
-                    }
-                  >
-                    {c.report.roas.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-
-              {/* === Popover Aksi === */}
-              {c.state === 'ended' ? (
-                <Tooltip content="Mulai ulang">
-                  <Button
-                    isIconOnly
-                    as="a"
-                    href={`https://seller.shopee.co.id/portal/marketing/pas/live-stream/detail/${c.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="light"
-                    className="ml-2 text-default-500 hover:text-default-700"
-                  >
-                    <IconReload className="w-4 h-4" />
-                  </Button>
-                </Tooltip>
-              ) : (
-                <Popover placement="bottom-end">
-                  <PopoverTrigger asChild>
+                {c.state === 'ended' ? (
+                  <Tooltip content="Mulai ulang">
                     <Button
                       isIconOnly
+                      size="sm"
+                      as="a"
+                      href={`https://seller.shopee.co.id/portal/marketing/pas/live-stream/detail/${c.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       variant="light"
-                      className="ml-2 text-default-500 hover:text-default-700"
+                      className="text-default-500 hover:text-default-700 min-w-6 w-6 h-6"
                     >
-                      <IconDotsVertical className="w-4 h-4" />
+                      <IconReload className="w-3.5 h-3.5" />
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-36 p-1">
-                    {/* Aktifkan */}
-                    <Button
-                      fullWidth
-                      variant="light"
-                      isDisabled={c.state === 'ongoing' || isUpdating('resume')}
-                      onPress={() => handleStatusChange(c.id, 'resume')}
-                      startContent={
-                        isUpdating('resume') ? (
-                          <Spinner size="sm" className="flex-none w-5 h-5" />
-                        ) : (
-                          <IconPlayerPlayFilled
-                            className={`w-4 h-4 ${
-                              c.state === 'ongoing'
-                                ? 'text-gray-400'
-                                : 'text-green-500'
-                            }`}
-                          />
-                        )
-                      }
-                      className={`justify-start items-center ${
-                        c.state === 'ongoing' || isUpdating('resume')
-                          ? 'text-gray-400 hover:text-gray-400'
-                          : ''
-                      }`}
-                    >
-                      Aktifkan
-                    </Button>
-
-                    {/* Jeda */}
-                    <Button
-                      fullWidth
-                      variant="light"
-                      isDisabled={c.state === 'paused' || isUpdating('pause')}
-                      onPress={() => handleStatusChange(c.id, 'pause')}
-                      startContent={
-                        isUpdating('pause') ? (
-                          <Spinner size="sm" className="flex-none w-5 h-5" />
-                        ) : (
-                          <IconPlayerPauseFilled
-                            className={`w-4 h-4 ${
-                              c.state === 'paused'
-                                ? 'text-gray-400'
-                                : 'text-yellow-500'
-                            }`}
-                          />
-                        )
-                      }
-                      className={`justify-start items-center ${
-                        c.state === 'paused' || isUpdating('pause')
-                          ? 'text-gray-400 hover:text-gray-400'
-                          : ''
-                      }`}
-                    >
-                      Jeda
-                    </Button>
-
-                    {/* Berhenti */}
-                    <Button
-                      fullWidth
-                      variant="light"
-                      isDisabled={c.state === 'ended' || isUpdating('stop')}
-                      onPress={() => handleStatusChange(c.id, 'stop')}
-                      startContent={
-                        isUpdating('stop') ? (
-                          <Spinner size="sm" className="flex-none w-5 h-5" />
-                        ) : (
-                          <IconPlayerStopFilled
-                            className={`w-4 h-4 ${
-                              c.state === 'ended'
-                                ? 'text-gray-400'
-                                : 'text-red-500'
-                            }`}
-                          />
-                        )
-                      }
-                      className={`justify-start items-center ${
-                        c.state === 'ended' || isUpdating('stop')
-                          ? 'text-gray-400 hover:text-gray-400'
-                          : ''
-                      }`}
-                    >
-                      Berhenti
-                    </Button>
-                  </PopoverContent>
-                </Popover>
-              )}
+                  </Tooltip>
+                ) : (
+                  <Popover placement="bottom-end">
+                    <PopoverTrigger asChild>
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        className="text-default-500 hover:text-default-700 min-w-6 w-6 h-6"
+                      >
+                        <IconCaretDownFilled className="w-3.5 h-3.5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-36 p-1">
+                      <Button
+                        fullWidth
+                        variant="light"
+                        size="sm"
+                        isDisabled={
+                          c.state === 'ongoing' || isUpdating('resume')
+                        }
+                        onPress={() => handleStatusChange(c.id, 'resume')}
+                        startContent={
+                          isUpdating('resume') ? (
+                            <Spinner size="sm" className="flex-none w-4 h-4" />
+                          ) : (
+                            <IconPlayerPlayFilled
+                              className={`w-3.5 h-3.5 ${
+                                c.state === 'ongoing'
+                                  ? 'text-gray-400'
+                                  : 'text-green-500'
+                              }`}
+                            />
+                          )
+                        }
+                        className={`justify-start ${
+                          c.state === 'ongoing' || isUpdating('resume')
+                            ? 'text-gray-400'
+                            : ''
+                        }`}
+                      >
+                        Aktifkan
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="light"
+                        size="sm"
+                        isDisabled={c.state === 'paused' || isUpdating('pause')}
+                        onPress={() => handleStatusChange(c.id, 'pause')}
+                        startContent={
+                          isUpdating('pause') ? (
+                            <Spinner size="sm" className="flex-none w-4 h-4" />
+                          ) : (
+                            <IconPlayerPauseFilled
+                              className={`w-3.5 h-3.5 ${
+                                c.state === 'paused'
+                                  ? 'text-gray-400'
+                                  : 'text-yellow-500'
+                              }`}
+                            />
+                          )
+                        }
+                        className={`justify-start ${
+                          c.state === 'paused' || isUpdating('pause')
+                            ? 'text-gray-400'
+                            : ''
+                        }`}
+                      >
+                        Jeda
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="light"
+                        size="sm"
+                        isDisabled={c.state === 'ended' || isUpdating('stop')}
+                        onPress={() => handleStatusChange(c.id, 'stop')}
+                        startContent={
+                          isUpdating('stop') ? (
+                            <Spinner size="sm" className="flex-none w-4 h-4" />
+                          ) : (
+                            <IconPlayerStopFilled
+                              className={`w-3.5 h-3.5 ${
+                                c.state === 'ended'
+                                  ? 'text-gray-400'
+                                  : 'text-red-500'
+                              }`}
+                            />
+                          )
+                        }
+                        className={`justify-start ${
+                          c.state === 'ended' || isUpdating('stop')
+                            ? 'text-gray-400'
+                            : ''
+                        }`}
+                      >
+                        Berhenti
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
             </div>
 
-            {/* Divider antar item */}
-            {idx < campaigns.length - 1 && <Divider className="my-5" />}
+            {/* === Spent Amount === */}
+            <div className="flex justify-between items-center mb-2">
+              <Tooltip content="Daily Budget" size="sm" offset={-2} showArrow>
+                <div className="text-base font-bold text-default-800 dark:text-gray-100">
+                  {formatScaledRupiah(c.daily_budget)}
+                </div>
+              </Tooltip>
+              <div className="text-right">
+                <div
+                  className={`text-sm font-semibold ${
+                    c.report.roas >= effectivenessThreshold
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-red-500 dark:text-red-400'
+                  }`}
+                >
+                  {c.report.roas.toFixed(2)}
+                </div>
+              </div>
+            </div>
+
+            {/* === Progress Bar === */}
+            <div className="mb-2">
+              <div className="flex justify-between text-xs text-default-500 dark:text-gray-400 mb-1">
+                <span>{rawPercent < 1 ? '0' : Math.round(rawPercent)}%</span>
+                <Tooltip
+                  size="sm"
+                  content="Biaya Terpakai"
+                  offset={-2}
+                  placement="bottom"
+                  showArrow
+                >
+                  <span className="flex items-center gap-1">
+                    {formatScaledRupiah(c.spent)}
+                  </span>
+                </Tooltip>
+              </div>
+              <Progress
+                aria-label="Budget spent"
+                size="md"
+                value={percentSpent}
+                color={percentSpent >= 100 ? 'success' : 'danger'}
+                className="h-1.5"
+              />
+            </div>
           </div>
         )
       })}

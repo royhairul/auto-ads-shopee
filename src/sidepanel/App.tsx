@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Tooltip,
@@ -8,6 +8,10 @@ import {
   Switch,
   Select,
   SelectItem,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  ButtonGroup,
 } from '@heroui/react'
 import {
   IconRefresh,
@@ -20,18 +24,19 @@ import {
   IconCash,
   IconSquareRoundedPlusFilled,
   IconCircleDashedCheck,
+  IconReload,
 } from '@tabler/icons-react'
-
 import {
   getProfile,
   getShopeeTodayData,
   getShopeeCampaign,
   formatScaledRupiah,
 } from '@/services/shopee'
-import ProfileCard from '@/components/Sidepanel/ProfileCard'
 import StatsCard from '@/components/Sidepanel/StatsCard'
 import CampaignList from '@/components/Sidepanel/CampaignList'
 import type { ShopeeCampaign } from '@/types/shopee'
+import { getActiveLive } from '@/services/shopee/live'
+import ProfileSection from '@/components/Sidepanel/ProfileSection'
 
 interface CampaignResponse {
   campaigns: ShopeeCampaign[]
@@ -86,6 +91,12 @@ export default function App() {
     refetchInterval: 300_000,
   })
 
+  const liveQuery = useQuery({
+    queryKey: ['shopeeLive'],
+    queryFn: getActiveLive,
+    refetchInterval: 300_000,
+  })
+
   const todayQuery = useQuery({
     queryKey: ['shopeeTodayData'],
     queryFn: getShopeeTodayData,
@@ -128,7 +139,7 @@ export default function App() {
 
   useEffect(() => {
     campaignQuery.refetch()
-  }, [filterStatus])
+  }, [filterStatus, campaignQuery])
 
   // === Force Check dari Background ===
   const handleForceCheck = async () => {
@@ -140,9 +151,11 @@ export default function App() {
   }
 
   // === Auto Refresh setiap 1 menit ===
+  const intervalRef = useRef<number>(null)
+
   useEffect(() => {
-    const interval = setInterval(handleRefresh, 60_000)
-    return () => clearInterval(interval)
+    if (intervalRef.current) return
+    intervalRef.current = setInterval(handleRefresh, 60000)
   }, [handleRefresh])
 
   // === Listener pesan dari Background ===
@@ -184,18 +197,30 @@ export default function App() {
         <p className="text-xs text-default-500 max-w-[220px]">
           Silakan login ke akun Shopee Seller Anda untuk menampilkan data iklan.
         </p>
-        <Button
-          as="a"
-          href="https://seller.shopee.co.id/"
-          target="_blank"
-          rel="noopener noreferrer"
-          color="warning"
-          radius="full"
-          variant="flat"
-          className="mt-2 font-medium"
-        >
-          Buka Shopee Seller Center
-        </Button>
+
+        <ButtonGroup variant="flat" className="gap-1">
+          <Button
+            as="a"
+            href="https://seller.shopee.co.id/"
+            target="_blank"
+            rel="noopener noreferrer"
+            color="warning"
+            radius="full"
+            className="font-medium"
+          >
+            Buka Shopee Seller Center
+          </Button>
+
+          <Tooltip content="Reload Extension" placement="top">
+            <Button
+              isIconOnly
+              onPress={() => chrome.runtime.reload()}
+              className="text-default-500 hover:text-default-700 dark:text-gray-200 dark:hover:text-white"
+            >
+              <IconReload size={18} />
+            </Button>
+          </Tooltip>
+        </ButtonGroup>
       </div>
     )
   }
@@ -217,15 +242,17 @@ export default function App() {
 
   // Hitung rata-rata efektivitas
   const activeCampaign = campaigns.filter((c) => c.state === 'ongoing')
+  const totalGMV =
+    (liveQuery.data?.reduce((acc, curr) => acc + curr.gmv, 0) ?? 0) * 100000
+
   const effectiveness =
-    activeCampaign.length > 0
-      ? activeCampaign.reduce((total, c) => total + (c.report.roas || 0), 0) /
-        activeCampaign.length
+    activeCampaign.length > 0 && todayQuery.data?.expenseToday > 0
+      ? totalGMV / todayQuery.data?.expenseToday
       : 0
 
   // === UI Utama ===
   return (
-    <div className="w-full p-5 mt-6 flex flex-col items-start gap-5">
+    <div className="w-full p-3 flex flex-col items-start gap-3">
       {/* Toolbar */}
       <div className="w-full flex items-center justify-between gap-2">
         <Switch
@@ -236,7 +263,7 @@ export default function App() {
         />
 
         <div>
-          <Tooltip content="Refresh data">
+          <Tooltip content="Refresh data" placement="top">
             <Button
               isIconOnly
               size="sm"
@@ -247,7 +274,10 @@ export default function App() {
               <IconRefresh size={18} />
             </Button>
           </Tooltip>
-          <Tooltip content={isDark ? 'Light mode' : 'Dark mode'}>
+          <Tooltip
+            content={isDark ? 'Light mode' : 'Dark mode'}
+            placement="top"
+          >
             <Button
               isIconOnly
               size="sm"
@@ -258,7 +288,7 @@ export default function App() {
               {isDark ? <IconSun size={18} /> : <IconMoon size={18} />}
             </Button>
           </Tooltip>
-          <Tooltip content="Pengaturan / Options">
+          <Tooltip content="Pengaturan / Options" placement="top">
             <Button
               isIconOnly
               size="sm"
@@ -273,9 +303,10 @@ export default function App() {
       </div>
 
       {/* Profil */}
-      <ProfileCard
+      <ProfileSection
         profile={profileQuery.data}
-        loading={profileQuery.isLoading}
+        profileLoading={profileQuery.isLoading}
+        liveData={liveQuery.data}
       />
 
       {/* Stats */}
@@ -306,7 +337,6 @@ export default function App() {
           )
         }
       />
-
       <StatsCard
         title="Biaya Hari Ini"
         icon={IconCash}
@@ -316,21 +346,39 @@ export default function App() {
         value={
           <div className="w-full flex justify-between font-semibold text-lg">
             <span>{formatScaledRupiah(todayQuery.data?.expenseToday)}</span>
-            <span
-              className={`gap-2 flex items-center text-sm
-                ${
-                  effectiveness >= effectivenessThreshold
-                    ? 'text-green-500'
-                    : 'text-red-500'
-                }`}
-            >
-              {effectiveness < effectivenessThreshold ? (
-                <IconAlertTriangleFilled size={16} />
-              ) : (
-                <IconCircleDashedCheck size={16} />
-              )}
-              {effectiveness.toFixed(2)}
-            </span>
+            <Popover>
+              <PopoverTrigger className="cursor-pointer">
+                <span
+                  className={`gap-2 flex items-center text-sm
+                    ${
+                      effectiveness >= effectivenessThreshold
+                        ? 'text-green-500'
+                        : 'text-red-500'
+                    }`}
+                >
+                  {effectiveness < effectivenessThreshold ? (
+                    <IconAlertTriangleFilled size={16} />
+                  ) : (
+                    <IconCircleDashedCheck size={16} />
+                  )}
+                  {effectiveness.toFixed(2)}
+                </span>
+              </PopoverTrigger>
+              <PopoverContent>
+                <div className="px-1 py-2">
+                  <div className="text-tiny flex gap-4 justify-between">
+                    <span>GMV</span>
+                    <span>{formatScaledRupiah(totalGMV)}</span>
+                  </div>
+                  <div className="text-tiny flex gap-4 justify-between">
+                    <span>Biaya</span>
+                    <span>
+                      {formatScaledRupiah(todayQuery.data?.expenseToday)}
+                    </span>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         }
         loading={todayQuery.isLoading}
@@ -339,12 +387,13 @@ export default function App() {
       {/* Filter Status */}
       <div className="w-full flex justify-between items-center gap-2">
         <Select
-          label="Status"
           size="sm"
           variant="faded"
           selectedKeys={[filterStatus]}
           onChange={(e) => setFilterStatus(e.target.value)}
           className="max-w-40"
+          aria-label="Filter Status Campaign"
+          disallowEmptySelection
         >
           <SelectItem key="all">Semua</SelectItem>
           <SelectItem key="ongoing">Berjalan</SelectItem>

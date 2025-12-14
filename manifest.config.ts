@@ -31,7 +31,11 @@ export default defineManifest({
     'notifications',
   ],
 
-  host_permissions: ['https://shopee.co.id/*', 'https://seller.shopee.co.id/*'],
+  host_permissions: [
+    'https://shopee.co.id/*',
+    'https://seller.shopee.co.id/*',
+    'https://creator.shopee.co.id/*',
+  ],
 
   // content_scripts: [
   //   {

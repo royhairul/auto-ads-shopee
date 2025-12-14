@@ -42,21 +42,21 @@ export default function StatsCard({
 
   return (
     <Card className={clsx('w-full', colorClasses[colorScheme])}>
-      <CardHeader className="flex gap-2 items-center">
-        <Icon size={20} />
-        <p className="font-semibold dark:text-white">{title}</p>
+      <CardHeader className="flex gap-2 items-center py-1 px-3 pt-2">
+        <Icon size={18} />
+        <p className="text-xs font-semibold dark:text-white">{title}</p>
       </CardHeader>
 
       <CardBody
         className={clsx(
-          'flex flex-col gap-2',
+          'flex flex-col gap-1.5 pt-0 px-3 pb-1.5',
           footerPosition === 'inside' && 'pb-0'
         )}
       >
         {loading ? (
           <Skeleton className="w-24 h-6 rounded-md dark:bg-gray-700" />
         ) : (
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             {typeof value === 'number' ? (
               <p className="text-lg font-bold dark:text-white">
                 {typeof value === 'number' ? formatScaledRupiah(value) : value}
@@ -64,19 +64,19 @@ export default function StatsCard({
             ) : (
               value
             )}
-            {action && <div>{action}</div>}
+            {action && <div className="shrink-0">{action}</div>}
           </div>
         )}
 
         {footer && footerPosition === 'inside' && (
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {footer}
           </div>
         )}
       </CardBody>
 
       {footer && footerPosition === 'bottom' && (
-        <CardFooter className="flex flex-col items-start space-y-2">
+        <CardFooter className="flex flex-col items-start py-2 px-3 pt-0 gap-1.5">
           {footer}
         </CardFooter>
       )}

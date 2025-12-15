@@ -12,6 +12,7 @@ const elements = {
     heroDownloadBtn: document.getElementById('hero-download-btn'),
     totalDownloads: document.getElementById('total-downloads'),
     totalReleases: document.getElementById('total-releases'),
+    latestVersionStat: document.getElementById('latest-version-stat'),
 
     downloadLoading: document.getElementById('download-loading'),
     downloadContent: document.getElementById('download-content'),
@@ -152,6 +153,11 @@ function updateStats(releases) {
     const totalDownloads = calculateTotalDownloads(releases);
     elements.totalDownloads.textContent = totalDownloads.toLocaleString('id-ID');
     elements.totalReleases.textContent = releases.length;
+
+    // Update latest version stat
+    if (releases.length > 0) {
+        elements.latestVersionStat.textContent = releases[0].tag_name;
+    }
 }
 
 /**

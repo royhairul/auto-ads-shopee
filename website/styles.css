@@ -796,6 +796,167 @@ body {
   font-size: 0.8rem;
 }
 
+/* Install Section */
+.install {
+  padding: 6rem 2rem;
+  background: var(--bg-dark);
+}
+
+.section-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 3rem auto 0;
+}
+
+.install-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: all var(--transition-normal);
+}
+
+.install-step:hover {
+  border-color: var(--primary);
+  transform: translateX(8px);
+  box-shadow: var(--shadow-md);
+}
+
+.install-step .step-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  background: rgba(238, 77, 45, 0.1);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.install-step .step-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--primary);
+}
+
+.install-step .step-number {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  font-size: 0.875rem;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.step-details {
+  flex: 1;
+}
+
+.step-details h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.step-details p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.step-details code {
+  background: var(--bg-dark);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--primary-light);
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.step-details strong {
+  color: var(--text-primary);
+}
+
+.install-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: rgba(238, 77, 45, 0.08);
+  border: 1px solid rgba(238, 77, 45, 0.2);
+  border-radius: var(--radius-md);
+  margin-top: 2rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.install-note svg {
+  stroke: var(--primary);
+  min-width: 20px;
+  margin-top: 2px;
+}
+
+.install-note p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.install-note strong {
+  color: var(--primary-light);
+}
+
+@media (max-width: 768px) {
+  .install-step {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .install-step .step-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .install-step .step-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .step-details h4 {
+    font-size: 1rem;
+  }
+
+  .step-details p {
+    font-size: 0.9rem;
+  }
+}
+
 /* Releases Section */
 .releases {
   background: rgba(0, 0, 0, 0.3);

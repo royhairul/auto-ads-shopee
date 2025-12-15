@@ -22,7 +22,6 @@ const elements = {
     latestTitle: document.getElementById('latest-title'),
     latestNotes: document.getElementById('latest-notes'),
     latestDownloadBtn: document.getElementById('latest-download-btn'),
-    latestGithubBtn: document.getElementById('latest-github-btn'),
     latestSize: document.getElementById('latest-size'),
 
     releasesLoading: document.getElementById('releases-loading'),
@@ -165,7 +164,6 @@ function displayLatestRelease(release) {
     elements.latestDate.textContent = formatDate(release.published_at);
     elements.latestTitle.textContent = release.name || release.tag_name;
     elements.latestNotes.innerHTML = markdownToHtml(release.body);
-    elements.latestGithubBtn.href = release.html_url;
 
     if (zipAsset) {
         elements.latestDownloadBtn.href = zipAsset.browser_download_url;
@@ -207,9 +205,6 @@ function createReleaseItem(release, isLatest = false) {
           Download ${formatBytes(zipAsset.size)}
         </a>
       ` : ''}
-      <a href="${release.html_url}" target="_blank" class="btn btn-outline">
-        View on GitHub
-      </a>
     </div>
   `;
 
@@ -250,10 +245,7 @@ function showError() {
     elements.downloadLoading.style.display = 'none';
     elements.downloadError.style.display = 'block';
     elements.releasesLoading.innerHTML = `
-    <p style="color: var(--text-secondary);">Gagal memuat releases.</p>
-    <a href="https://github.com/${GITHUB_REPO}/releases" target="_blank" class="btn btn-outline">
-      Buka GitHub Releases
-    </a>
+    <p style="color: var(--text-secondary);">Gagal memuat releases. Silakan coba lagi nanti.</p>
   `;
 }
 
@@ -296,16 +288,8 @@ if (elements.loadMoreBtn) {
     });
 }
 
-// Smooth scroll for anchor links (excludes download buttons)
+// Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    // Skip download buttons - they will have their href updated dynamically
-    if (anchor.classList.contains('btn-download') ||
-        anchor.classList.contains('btn-primary') ||
-        anchor.id === 'latest-download-btn' ||
-        anchor.id === 'hero-download-btn') {
-        return;
-    }
-
     anchor.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
         // Only handle internal anchor links, not external URLs

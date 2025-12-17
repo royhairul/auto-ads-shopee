@@ -5,7 +5,6 @@ import {
   CardBody,
   CardFooter,
   Switch,
-  Input,
   Button,
   addToast,
 } from '@heroui/react'
@@ -36,14 +35,7 @@ export default function NotificationTab() {
     },
   })
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
-    formState: { errors },
-  } = form
+  const { handleSubmit, reset, watch, setValue } = form
 
   const notificationsEnabled = watch('notificationsEnabled')
 
